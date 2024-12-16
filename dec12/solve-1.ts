@@ -1,6 +1,6 @@
 import { readFileSync } from "bun:fs";
 
-const map = readFileSync("./data.txt", "utf-8")
+const map = readFileSync("./example-data.txt", "utf-8")
   .split("\n")
   .map((line) => line.split(""));
 
@@ -40,11 +40,17 @@ const isRegionAdjacentToRegionOfType =
     );
   };
 
-const scanRegions = (map: string[][]): Region[] => {
+const scanRegions = (
+  map: string[][],
+  typeFilter?: (type: string) => boolean
+): Region[] => {
   const regions: Region[] = [];
   for (let y = 0; y < map.length; y++) {
     for (let x = 0; x < map[y].length; x++) {
       const type = map[y][x];
+      if (typeFilter !== undefined && !typeFilter(type)) {
+        continue;
+      }
       const coord: Coordinate = { x, y };
 
       const region = regions.find(
@@ -95,9 +101,6 @@ while (mergedRegions.length < startRegions.length) {
 const totalPrice = mergedRegions.reduce((acc, region) => {
   const area = getArea(region);
   const perimeterLength = getPerimeterLength(region);
-
-  console.log(region.type, area, perimeterLength, area * perimeterLength);
-
   return acc + area * perimeterLength;
 }, 0);
 
